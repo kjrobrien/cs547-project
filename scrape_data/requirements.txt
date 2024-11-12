@@ -1,2 +1,4 @@
 igdb_api_v4==0.3.3
 protobuf==5.28.2
+requests
+cloudscraper
