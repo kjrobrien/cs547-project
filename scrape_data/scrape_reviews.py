@@ -47,5 +47,7 @@ scraper = cloudscraper.create_scraper()
 
 response = scraper.post(args.url, json={'query': query, 'variables': variables})
 
-print(response)
-print(response.json())
+if response.status_code == 200:
+    print(response.json())
+else:
+    print(response.text)
