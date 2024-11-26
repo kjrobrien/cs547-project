@@ -28,7 +28,9 @@ game_similarity_df = user_game_matrix.corr(method="pearson")
 
 def get_top_similar(slug, similarity_df):
     similar = similarity_df[slug].sort_values(ascending=False)
-    return similar[1:int(args.num_recommendations) + 1]
+    # Exclude the current game slug from the results
+    similar = similar[similar.index != slug]
+    return similar[0:int(args.num_recommendations) + 1]
 
 similar_items = get_top_similar(args.game_slug, game_similarity_df)
 
