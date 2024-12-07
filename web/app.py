@@ -15,6 +15,8 @@ from gpt_recommender import gpt_recommender
 
 games = []
 
+slug_to_name = {}
+
 app = Flask(__name__)
 
 HTML_TEMPLATE = """
@@ -35,6 +37,10 @@ HTML_TEMPLATE = """
     <script>
         async function submitGames(event) {
             event.preventDefault();
+            const collabList = document.getElementById("collabResponse");
+            const chatGPTList = document.getElementById("chatGPTResponse");
+            collabList.innerHTML = "Loading...";
+            chatGPTList.innerHTML = "Loading...";
             const selectedGames = Array.from(document.getElementById("games").selectedOptions).map(opt => opt.value);
             const response = await fetch('/recommendations', {
                 method: 'POST',
@@ -44,47 +50,57 @@ HTML_TEMPLATE = """
                 body: JSON.stringify({ "gameSlugs": selectedGames })
             });
             const result = await response.json();
-            document.getElementById("response").textContent = JSON.stringify(result, false, 2);
+            
+            collabList.innerHTML = "";
+            result.itemCollaborativeFiltering.forEach(x => {
+                const li = document.createElement("li");
+                li.textContent = `${x.name}: ${x.value}`;
+                collabList.appendChild(li);
+            });
+            
+            chatGPTList.innerHTML = "";
+            result.chatGPT.forEach(x => {
+                const li = document.createElement("li");
+                li.textContent = `${x.name}: ${x.value}`;
+                chatGPTList.appendChild(li);
+            })
         }
     </script>
 </head>
-<style>
-    .box {
-        width: 200px;
-        height: 200px;
-    }
-    .container {
-        display: flex;
-        gap: 20px;
-        margin-bottom: 20px;
-    }
-    .buttons {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: 10px;
-    }
-</style>
 
 <body>
-    <div class="mb-3">
-        <h1>Select Games</h1>
+    <div class="container">
+        <div class="row mb-3">
+            <h1>Select Games</h1>
 
-        <form onsubmit="submitGames(event)">
-            <div class="mb-3">
-            
-                <select id="games" name="games" multiple class="form-control selectpicker" data-live-search="true" style="width=100%">
-                    {% for game in games %}
-                    <option value="{{ game['slug'] }}">{{ game['name'] }}</option>
-                    {% endfor %}
-                </select>
+            <form onsubmit="submitGames(event)">
+                <div class="mb-3">
+                
+                    <select id="games" name="games" multiple class="form-control selectpicker" data-live-search="true" style="width=100%">
+                        {% for game in games %}
+                        <option value="{{ game['slug'] }}">{{ game['name'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        <div class="row">
+            <h2>Recommendations:</h2>
+
+            <div class="col">
+                <h3>Collaborative Filtering</h3>
+                <ul id="collabResponse"></ul>
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-    </div>
-    <div>
-    <h2>Response:</h2>
-    <pre id="response" style="background: #f4f4f4; padding: 10px; border: 1px solid #ddd;"></pre>
+            <div class="col">
+                <h3>Content-Based Filtering</h3>
+                <ul id="contentResponse"></ul>
+            </div>
+            <div class="col">
+                <h3>ChatGPT</h3>
+                <ul id="chatGPTResponse"></ul>
+            </div>
+        </div>
     </div>
 </body>
 </html>
@@ -100,11 +116,11 @@ def run_collab_filter(game_slugs):
     ug, sim = collaborative_filtering.get_user_game_matrix_similarity_df(aggregated_df)
     similar_items = collaborative_filtering.get_top_similar(game_slugs, sim, 10)
     
-    return [{'slug': idx, 'value': val} for idx, val in similar_items.items()]
+    return [{'name': slug_to_name.get(idx, idx), 'value': round(val,2)} for idx, val in similar_items.items()]
 
 def run_chatgpt_recommender(game_slugs):
     games = gpt_recommender.recommend_games(args.openai_api_key, args.games_input, game_slugs, 15)
-    return [{'slug': x.slug, 'value': x.score} for x in games]
+    return [{'name': slug_to_name.get(x.slug, x.slug), 'value': x.score} for x in games]
     
 
 @app.route("/recommendations", methods=["POST"])
@@ -135,5 +151,7 @@ if __name__ == '__main__':
         def sortKey(g):
             return g["name"]
         games.sort(key=sortKey)
+        for game in games:
+            slug_to_name[game["slug"]] = game["name"]
 
     app.run(host='0.0.0.0', port=5000, debug=True)
