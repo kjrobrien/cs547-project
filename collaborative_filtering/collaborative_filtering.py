@@ -8,7 +8,7 @@ import numpy as np
 parser = argparse.ArgumentParser(description="Take a ratings CSV file a run collaborative filtering.")
 
 parser.add_argument("--input", required=True, help="Input CSV file")
-parser.add_argument("--game-slug", required=True, help="The game slug to get recommendations")
+parser.add_argument("--game-slugs", required=True, help="The game slugs to get recommendations")
 parser.add_argument("--num-recommendations", required=True, help="Number of recommendations")
 
 args= parser.parse_args()
@@ -17,15 +17,16 @@ df = pandas.read_csv(args.input)
 
 df = df.dropna()
 
-train_df, test_df = train_test_split(df, test_size=0.2)
-
 # Grab the user's highest rating for a game.
-aggregated_df = train_df.groupby(['user_slug', 'game_slug']).rating.max().reset_index()
+aggregated_df = df.groupby(['user_slug', 'game_slug']).rating.max().reset_index()
 
-user_game_matrix = aggregated_df.pivot(index="user_slug", columns="game_slug", values="rating").fillna(0)
+train_df, test_df = train_test_split(aggregated_df, test_size=0.2)
 
-# Use pearson correlation for calculating similarity.
-game_similarity_df = user_game_matrix.corr(method="pearson")
+def get_user_game_matrix_similarity_df(df):
+    user_game_matrix = df.pivot(index="user_slug", columns="game_slug", values="rating").fillna(0)
+    # Use pearson correlation for calculating similarity.
+    return [user_game_matrix, user_game_matrix.corr(method="pearson", min_periods=1)]
+
 
 def predict_rating(user_slug, game_slug, similarity_df, user_game_matrix):
     if game_slug not in similarity_df.index:
@@ -34,34 +35,38 @@ def predict_rating(user_slug, game_slug, similarity_df, user_game_matrix):
     if user_slug not in user_game_matrix.index:
         return np.nan
     
-    similar_games = similarity_df[game_slug].drop(game_slug).dropna()
+    similar_games = similarity_df[game_slug].drop(game_slug)
     
-    user_ratings = user_game_matrix.loc[user_slug, similar_games.index].dropna()
+    user_ratings = user_game_matrix.loc[user_slug, similar_games.index]
     
-    if user_ratings.empty:
-        return np.nan
+    user_ratings = user_ratings[user_ratings != 0]
     
     return np.dot(user_ratings, similar_games[user_ratings.index]) / similar_games[user_ratings.index].sum()
 
-test_df['predicted_rating'] = test_df.apply(
-    lambda row: predict_rating(row['user_slug'], row['game_slug'], game_similarity_df, user_game_matrix),
-    axis=1
-)
+def evaluate(train_df, test_df):
+    user_game_matrix, game_similarity_df = get_user_game_matrix_similarity_df(train_df)
+    
+    test_df['predicted_rating'] = test_df.apply(
+        lambda row: predict_rating(row['user_slug'], row['game_slug'], game_similarity_df, user_game_matrix),
+        axis=1
+    )
+    test_df = test_df.dropna(subset=['predicted_rating'])
+    
+    return np.sqrt(mean_squared_error(test_df['rating'], test_df['predicted_rating']))
 
+# Use the training and test sets for evaluation
+print(f"RMSE: {evaluate(train_df, test_df)}")
 
-test_df = test_df.dropna(subset=['predicted_rating'])
+def get_top_similar(game_slugs, similarity_df):
+    similar = similarity_df[game_slugs].mean(axis=1)
+    similar = similar.drop(game_slugs)
+    return similar.sort_values(ascending=False).head(int(args.num_recommendations))
 
-rmse = np.sqrt(mean_squared_error(test_df['rating'], test_df['predicted_rating']))
+# Use the full dataset for predicting incoming game_slugs for user outside dataset
+ug, sim = get_user_game_matrix_similarity_df(aggregated_df)
 
-print(f"RMSE: {rmse}")
+# RMSE at last run was 2.68
 
-
-def get_top_similar(game_slug, similarity_df):
-    similar = similarity_df[game_slug].sort_values(ascending=False)
-    # Exclude the current game slug from the results
-    similar = similar[similar.index != game_slug]
-    return similar[0:int(args.num_recommendations) + 1]
-
-similar_items = get_top_similar(args.game_slug, game_similarity_df)
+similar_items = get_top_similar(args.game_slugs.split(","), sim)
 
 print(similar_items)
