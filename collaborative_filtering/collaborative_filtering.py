@@ -48,6 +48,8 @@ def evaluate(train_df, test_df):
 
 
 def get_top_similar(game_slugs, similarity_df, num):
+    # Only include games we have ratings for 
+    game_slugs = [game_slug for game_slug in game_slugs if game_slug in similarity_df.index]
     similar = similarity_df[game_slugs].mean(axis=1)
     similar = similar.drop(game_slugs)
     return similar.sort_values(ascending=False).head(num)

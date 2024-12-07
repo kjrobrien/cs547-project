@@ -54,14 +54,14 @@ HTML_TEMPLATE = """
             collabList.innerHTML = "";
             result.itemCollaborativeFiltering.forEach(x => {
                 const li = document.createElement("li");
-                li.textContent = `${x.name}: ${x.value}`;
+                li.textContent = `${x.name}: ${x.value ?? "Unknown Score"}`;
                 collabList.appendChild(li);
             });
             
             chatGPTList.innerHTML = "";
             result.chatGPT.forEach(x => {
                 const li = document.createElement("li");
-                li.textContent = `${x.name}: ${x.value}`;
+                li.textContent = `${x.name}: ${x.value ?? "Unknown Score"}`;
                 chatGPTList.appendChild(li);
             })
         }
@@ -116,7 +116,7 @@ def run_collab_filter(game_slugs):
     ug, sim = collaborative_filtering.get_user_game_matrix_similarity_df(aggregated_df)
     similar_items = collaborative_filtering.get_top_similar(game_slugs, sim, 10)
     
-    return [{'name': slug_to_name.get(idx, idx), 'value': round(val,2)} for idx, val in similar_items.items()]
+    return [{'name': slug_to_name.get(idx, idx), 'value': None if val != val else round(val,2)} for idx, val in similar_items.items()]
 
 def run_chatgpt_recommender(game_slugs):
     games = gpt_recommender.recommend_games(args.openai_api_key, args.games_input, game_slugs, 15)
