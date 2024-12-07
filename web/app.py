@@ -38,8 +38,10 @@ HTML_TEMPLATE = """
         async function submitGames(event) {
             event.preventDefault();
             const collabList = document.getElementById("collabResponse");
+            const contentList = document.getElementById("contentResponse");
             const chatGPTList = document.getElementById("chatGPTResponse");
             collabList.innerHTML = "Loading...";
+            contentList.innerHTML = "Loading...";
             chatGPTList.innerHTML = "Loading...";
             const selectedGames = Array.from(document.getElementById("games").selectedOptions).map(opt => opt.value);
             const response = await fetch('/recommendations', {
@@ -58,12 +60,19 @@ HTML_TEMPLATE = """
                 collabList.appendChild(li);
             });
             
+            contentList.innerHTML = "";
+            result.contentBasedFiltering.forEach(x => {
+                const li = document.createElement("li");
+                li.textContent = `${x.name}: ${x.value ?? "Unknown Score"}`;
+                contentList.appendChild(li);
+            });
+            
             chatGPTList.innerHTML = "";
             result.chatGPT.forEach(x => {
                 const li = document.createElement("li");
                 li.textContent = `${x.name}: ${x.value ?? "Unknown Score"}`;
                 chatGPTList.appendChild(li);
-            })
+            });
         }
     </script>
 </head>
@@ -130,6 +139,7 @@ def get_recommendations():
     
     response = {
         "itemCollaborativeFiltering": run_collab_filter(game_slugs),
+        "contentBasedFiltering": [],
         "chatGPT": run_chatgpt_recommender(game_slugs)
     }
     
