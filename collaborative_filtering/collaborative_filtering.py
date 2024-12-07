@@ -5,22 +5,14 @@ from sklearn.metrics import mean_squared_error
 import numpy as np
 
 
-parser = argparse.ArgumentParser(description="Take a ratings CSV file a run collaborative filtering.")
+def parse_file(input_file):
+    df = pandas.read_csv(input_file)
 
-parser.add_argument("--input", required=True, help="Input CSV file")
-parser.add_argument("--game-slugs", required=True, help="The game slugs to get recommendations")
-parser.add_argument("--num-recommendations", required=True, help="Number of recommendations")
+    df = df.dropna()
 
-args= parser.parse_args()
+    # Grab the user's highest rating for a game.
+    return df.groupby(['user_slug', 'game_slug']).rating.max().reset_index()
 
-df = pandas.read_csv(args.input)
-
-df = df.dropna()
-
-# Grab the user's highest rating for a game.
-aggregated_df = df.groupby(['user_slug', 'game_slug']).rating.max().reset_index()
-
-train_df, test_df = train_test_split(aggregated_df, test_size=0.2)
 
 def get_user_game_matrix_similarity_df(df):
     user_game_matrix = df.pivot(index="user_slug", columns="game_slug", values="rating").fillna(0)
@@ -54,19 +46,36 @@ def evaluate(train_df, test_df):
     
     return np.sqrt(mean_squared_error(test_df['rating'], test_df['predicted_rating']))
 
-# Use the training and test sets for evaluation
-print(f"RMSE: {evaluate(train_df, test_df)}")
 
-def get_top_similar(game_slugs, similarity_df):
+def get_top_similar(game_slugs, similarity_df, num):
     similar = similarity_df[game_slugs].mean(axis=1)
     similar = similar.drop(game_slugs)
-    return similar.sort_values(ascending=False).head(int(args.num_recommendations))
+    return similar.sort_values(ascending=False).head(num)
 
-# Use the full dataset for predicting incoming game_slugs for user outside dataset
-ug, sim = get_user_game_matrix_similarity_df(aggregated_df)
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Take a ratings CSV file a run collaborative filtering.")
 
-# RMSE at last run was 2.68
+    parser.add_argument("--input", required=True, help="Input CSV file")
+    parser.add_argument("--game-slugs", required=True, help="The game slugs to get recommendations")
+    parser.add_argument("--num-recommendations", required=True, help="Number of recommendations")
 
-similar_items = get_top_similar(args.game_slugs.split(","), sim)
+    args= parser.parse_args()
+    
 
-print(similar_items)
+    aggregated_df = parse_file(args.input)
+    
+    train_df, test_df = train_test_split(aggregated_df, test_size=0.2)
+
+    # Use the training and test sets for evaluation
+    print(f"RMSE: {evaluate(train_df, test_df)}")
+    
+    # Use the full dataset for predicting incoming game_slugs for user outside dataset
+    ug, sim = get_user_game_matrix_similarity_df(aggregated_df)
+
+    # RMSE at last run was 2.68
+
+    similar_items = get_top_similar(args.game_slugs.split(","), sim, int(args.num_recommendations))
+
+    print(similar_items)
+
+

@@ -2,8 +2,16 @@ import argparse
 
 import json
 
+import sys
+
+import os
+
 
 from flask import Flask, request, jsonify, render_template_string
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/../')
+from collaborative_filtering import collaborative_filtering
+from gpt_recommender import gpt_recommender
 
 games = []
 
@@ -36,7 +44,7 @@ HTML_TEMPLATE = """
                 body: JSON.stringify({ "gameSlugs": selectedGames })
             });
             const result = await response.json();
-            document.getElementById("response").textContent = JSON.stringify(result);
+            document.getElementById("response").textContent = JSON.stringify(result, false, 2);
         }
     </script>
 </head>
@@ -86,19 +94,39 @@ HTML_TEMPLATE = """
 def home():
     return render_template_string(HTML_TEMPLATE, games=games)
 
+
+def run_collab_filter(game_slugs):
+    aggregated_df = collaborative_filtering.parse_file(args.ratings_csv)
+    ug, sim = collaborative_filtering.get_user_game_matrix_similarity_df(aggregated_df)
+    similar_items = collaborative_filtering.get_top_similar(game_slugs, sim, 10)
+    
+    return [{'slug': idx, 'value': val} for idx, val in similar_items.items()]
+
+def run_chatgpt_recommender(game_slugs):
+    games = gpt_recommender.recommend_games(args.openai_api_key, args.games_input, game_slugs, 15)
+    return [{'slug': x.slug, 'value': x.score} for x in games]
+    
+
 @app.route("/recommendations", methods=["POST"])
 def get_recommendations():
     data = request.get_json()
     game_slugs = data["gameSlugs"]
     
-    return jsonify(game_slugs), 200
+    response = {
+        "itemCollaborativeFiltering": run_collab_filter(game_slugs),
+        "chatGPT": run_chatgpt_recommender(game_slugs)
+    }
+    
+    return jsonify(response), 200
     
 
 if __name__ == '__main__':
     
-    parser = argparse.ArgumentParser(description="Take a ratings CSV file and a games JSON file and generate recommendations using chatgpt.")
+    parser = argparse.ArgumentParser(description="Runs a basic web ui for game recommendations.")
 
     parser.add_argument("--games-input", required=True, help="Input games JSON file")
+    parser.add_argument("--ratings-csv", required=True, help="Input ratings CSV")
+    parser.add_argument("--openai-api-key", required=True, help="API Key for Open AI")
     
     args= parser.parse_args()
     
