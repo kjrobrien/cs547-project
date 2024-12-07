@@ -3,7 +3,7 @@ import json
 
 # Load the JSON file
 def getJson():
-    with open("all_switch_games.json", "r") as file:
+    with open("../scrape_data/all_switch_games.json", "r") as file:
         all_switch_games = json.load(file)
     return all_switch_games
 
