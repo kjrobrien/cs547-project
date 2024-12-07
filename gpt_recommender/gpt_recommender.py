@@ -5,15 +5,6 @@ from pydantic import BaseModel
 
 
 
-parser = argparse.ArgumentParser(description="Take a ratings CSV file and a games JSON file and generate recommendations using chatgpt.")
-
-parser.add_argument("--games-input", required=True, help="Input games JSON file")
-parser.add_argument("--game-slugs", required=True, help="The game slug to get recommendations")
-parser.add_argument("--num-games", required=True, help="The number of games to recommend")
-parser.add_argument("--openai-api-key", required=True, help="API Key for Open AI")
-
-args= parser.parse_args()
-
 def convert_slugs_to_tag_strings(slugs):
     slugs_with_tags = []
     for slug in slugs:
@@ -28,29 +19,28 @@ class SlugWithScore(BaseModel):
 class GameResponse(BaseModel):
     slugs: list[SlugWithScore]
     
-client = OpenAI(
-    api_key=args.openai_api_key
-)
+def recommend_games(api_key, input_file, user_slugs, num_games):
+    
+    client = OpenAI(
+        api_key=api_key
+    )
 
-games = []
+    games = []
 
-with open(args.games_input, "r") as file:
-  games = json.load(file)
-  
-known_slugs = []
-  
-for game in games:
-    known_slugs.extend([game["slug"]])
+    with open(input_file, "r") as file:
+        games = json.load(file)
+    
+    known_slugs = []
+    
+    for game in games:
+        known_slugs.extend([game["slug"]])
 
-
-user_slugs = args.game_slugs.split(",")
-
-completion = client.beta.chat.completions.parse(
-    messages=[
-        {
-            "role": "system",
-            "content":
-f'''<INSTRUCTIONS>You are a helpful video game recommender. You have existing knowledge of all Nintendo Switch games.
+    completion = client.beta.chat.completions.parse(
+        messages=[
+            {
+                "role": "system",
+                "content":
+    f'''<INSTRUCTIONS>You are a helpful video game recommender. You have existing knowledge of all Nintendo Switch games.
 
 You will receive multiple tags:
 
@@ -60,23 +50,39 @@ You will receive multiple tags:
 </INSTRUCTIONS>
 
 <KNOWN_SLUGS>
-{convert_slugs_to_tag_strings(known_slugs)}
+    {convert_slugs_to_tag_strings(known_slugs)}
 
-</KNOWN_SLUGS>''',
-        },
-        {
-            "role": "user",
-            "content": f"<USER_SLUGS>{convert_slugs_to_tag_strings(user_slugs)}</USER_SLUGS><NUM_GAMES>{args.num_games}</NUM_GAMES>"
-        }
-    ],
-    model="gpt-4o-mini",
-    response_format=GameResponse,
-)
+    </KNOWN_SLUGS>''',
+            },
+            {
+                "role": "user",
+                "content": f"<USER_SLUGS>{convert_slugs_to_tag_strings(user_slugs)}</USER_SLUGS><NUM_GAMES>{num_games}</NUM_GAMES>"
+            }
+        ],
+        model="gpt-4o-mini",
+        response_format=GameResponse,
+    )
 
-recommendations = completion.choices[0].message.parsed
+    recommendations = completion.choices[0].message.parsed
 
 
-# Filter out any slug hallucinations, don't include any slugs the user provided
-filtered_slugs = [x for x in recommendations.slugs if x.slug in known_slugs and x.slug not in user_slugs]
+    # Filter out any slug hallucinations, don't include any slugs the user provided
+    filtered_slugs = [x for x in recommendations.slugs if x.slug in known_slugs and x.slug not in user_slugs]
+    
+    return filtered_slugs
 
-print(filtered_slugs)
+
+
+if __name__ == '__main__':
+    
+    parser = argparse.ArgumentParser(description="Take a ratings CSV file and a games JSON file and generate recommendations using chatgpt.")
+
+    parser.add_argument("--games-input", required=True, help="Input games JSON file")
+    parser.add_argument("--game-slugs", required=True, help="The game slug to get recommendations")
+    parser.add_argument("--num-games", required=True, help="The number of games to recommend")
+    parser.add_argument("--openai-api-key", required=True, help="API Key for Open AI")
+
+    args= parser.parse_args()
+    
+    games = recommend_games(args.openai_api_key, args.games_input, args.game_slugs.split(","), args.num_games)
+    print(games)
