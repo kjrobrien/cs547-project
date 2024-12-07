@@ -12,6 +12,7 @@ from flask import Flask, request, jsonify, render_template_string
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/../')
 from collaborative_filtering import collaborative_filtering
 from gpt_recommender import gpt_recommender
+from content_based_filtering import content_based
 
 games = []
 
@@ -127,8 +128,12 @@ def run_collab_filter(game_slugs):
     
     return [{'name': slug_to_name.get(idx, idx), 'value': None if val != val else round(val,2)} for idx, val in similar_items.items()]
 
+def run_content_based_filter(game_slugs):
+    recommendations = content_based.getRecommendations(args.games_input, game_slugs, 10)
+    return [{'name': game['name'], 'value': round(score,2)} for game, score in recommendations]
+
 def run_chatgpt_recommender(game_slugs):
-    games = gpt_recommender.recommend_games(args.openai_api_key, args.games_input, game_slugs, 15)
+    games = gpt_recommender.recommend_games(args.openai_api_key, args.games_input, game_slugs, 10)
     return [{'name': slug_to_name.get(x.slug, x.slug), 'value': x.score} for x in games]
     
 
@@ -139,7 +144,7 @@ def get_recommendations():
     
     response = {
         "itemCollaborativeFiltering": run_collab_filter(game_slugs),
-        "contentBasedFiltering": [],
+        "contentBasedFiltering": run_content_based_filter(game_slugs),
         "chatGPT": run_chatgpt_recommender(game_slugs)
     }
     

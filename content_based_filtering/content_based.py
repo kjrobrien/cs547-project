@@ -2,8 +2,8 @@
 import json
 
 # Load the JSON file
-def getJson():
-    with open("../scrape_data/all_switch_games.json", "r") as file:
+def getJson(input_file):
+    with open(input_file, "r") as file:
         all_switch_games = json.load(file)
     return all_switch_games
 
@@ -28,15 +28,15 @@ def jaccard_similarity_by_keyword(keyword, game, input_data):
 
 
 # Recommender System
-def recommend_games(input_games, dataset, top_n=5):
+def recommend_games(game_slugs, dataset, top_n):
     # Extract genre lists of input games
-    input_data = [game for game in dataset if game["id"] in input_games]
+    input_data = [game for game in dataset if game["slug"] in game_slugs]
 
     # Compute similarity scores
     scores = []
     games_considered = 0
     for game in dataset:
-        if game["id"] in input_games:
+        if game["slug"] in game_slugs:
             continue  # Skip input games
         games_considered += 1
         # map, keyword to weight
@@ -58,15 +58,15 @@ def recommend_games(input_games, dataset, top_n=5):
     print("Games considered: ", games_considered)
     print("Total game dataset: ", len(dataset))
     scores.sort(key=lambda x: x[1], reverse=True)
-    return [game for game, score in scores[:top_n]]
+    return scores[:top_n]
 
 
 # games = list of game ids
 # returns: top N games to be recommended
-def getRecommendations(games):
-    all_switch_games = getJson()
+def getRecommendations(input_file, game_slugs, top_n=5):
+    all_switch_games = getJson(input_file)
     # Get recommendations
-    recommendations = recommend_games(games, all_switch_games)
+    recommendations = recommend_games(game_slugs, all_switch_games, top_n)
     return recommendations
 
 
@@ -75,9 +75,11 @@ def getRecommendations(games):
 # 26758: Super Mario Odyssey # 8,31 # 69095, 268535, 268536
 # 119388: The Legend of Zelda: Tears of the Kingdom #12,31
 # input = [138251,26758,119388]
-input = [119388]
-recommendations = getRecommendations(input)
-print("=========================")
-print("Recommended Games:")
-for game in recommendations:
-    print(f"{game['name']} (ID: {game['id']})")
+
+if __name__ == "__main__":
+    game_slugs = ["the-legend-of-zelda-tears-of-the-kingdom"]
+    recommendations = getRecommendations("../scrape_data/all_switch_games.json", game_slugs)
+    print("=========================")
+    print("Recommended Games:")
+    for game, score in recommendations:
+        print(f"{game['name']} (ID: {game['id']})")
