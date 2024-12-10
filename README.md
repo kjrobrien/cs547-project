@@ -8,7 +8,7 @@ For more details, see [our website](https://kjrobrien.github.io/cs547-project/).
 
 # Structure
 
-- `scrape_data` - contains scripts for retrieveing data from IGDB API.
+- `scrape_data` - contains scripts for retrieving data from IGDB API.
 - `transform_data` - contains scripts for transforming data from IGDB API for usage in the rest of the project.
 - `collaborative_filtering` - contains the code for running item-based collaborative filtering on the transformed data. 
 - `content_based_filtering` - contains the code for running content-based filtering.
