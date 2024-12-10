@@ -19,8 +19,8 @@
 # in the templates via {{ site.myvariable }}.
 
 title: NextGame
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+baseurl: "/cs547-project" # the subpath of your site, e.g. /blog
+url: "https://kjrobrien.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 # Build settings
 theme: minima
 plugins:
