@@ -35,18 +35,22 @@ def recommend_games(game_slugs, dataset, top_n):
     # Compute similarity scores
     scores = []
     games_considered = 0
+    seenGames = {}
     for game in dataset:
         if game["slug"] in game_slugs:
             continue  # Skip input games
+        if game["id"] in seenGames:
+            continue
+        seenGames[game["id"]] = True
         games_considered += 1
         # map, keyword to weight
-        keyword_to_weights = {"genres": 0.5, "involved_companies": 0.5, "age_ratings": 0.5,
-                              "artworks": 0.5, "game_modes": 0.5, "keywords": 0.5,
-                              "player_perspectives": 0.5, "similar_games": 0.5, "tags": 0.5,
-                              "themes": 0.5, "language_supports": 0.5, "game_localizations": 0.5,
-                              "collections": 0.5, "franchises": 0.5, "game_engines": 0.5,
-                              "multiplayer_modes": 0.5, "remakes": 0.5, "category": 0.5,
-                              "expansions": 0.5, "parent_game": 0.5}
+        keyword_to_weights = {"genres": 0.75, "game_modes": 0.75, "player_perspectives": 0.75,
+                              "multiplayer_modes": 0.75, "keywords": 0.75,
+                              "similar_games": 0.75, "category": 0.75, "franchises": 0.75,
+                              "remakes": 0.75, "expansions": 0.75, "tags": 0.75,
+                              "age_ratings": 0.5, "artworks": 0.5, "themes": 0.5,
+                              "language_supports": 0.5, "collections": 0.5, "game_engines": 0.5,
+                              "involved_companies": 0.25, "parent_game": 0.25, "game_localizations": 0.25}
         combined_score = 0.0
         for keyword, weight in keyword_to_weights.items():
             similarity = jaccard_similarity_by_keyword(keyword, game, input_data)
