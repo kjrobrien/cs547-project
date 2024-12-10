@@ -4,6 +4,8 @@ This is a final project part of the WPI CS-547 Fall 2024 Information Retrieval c
 
 By: Augusto Wong, Kevin O'Brien
 
+For more details, see [our website](https://kjrobrien.github.io/cs547-project/).
+
 # Structure
 
 - `scrape_data` - contains scripts for retrieveing data from IGDB API.
