@@ -50,7 +50,8 @@ def recommend_games(game_slugs, dataset, top_n):
                               "remakes": 0.75, "expansions": 0.75, "tags": 0.75,
                               "age_ratings": 0.5, "artworks": 0.5, "themes": 0.5,
                               "language_supports": 0.5, "collections": 0.5, "game_engines": 0.5,
-                              "involved_companies": 0.25, "parent_game": 0.25, "game_localizations": 0.25}
+                              "game_localizations": 0.5,
+                              "involved_companies": 0.25, "parent_game": 0.25}
         combined_score = 0.0
         for keyword, weight in keyword_to_weights.items():
             similarity = jaccard_similarity_by_keyword(keyword, game, input_data)

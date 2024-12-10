@@ -45,31 +45,46 @@ We then used this work to expose a recommender that takes in a list of games and
 ## Content-based Filtering
 
 Content-based filtering recommends items that have similar properties to items a user has rated highly. We used many attributes from the 
-IGDB API and applied weights to each attribute. We then used Jaccard similarity to calculate similarities betweeen items' attributes.
+IGDB API and classified properties with 3 different weight groups based on importance. We then used Jaccard similarity to calculate
+similarities betweeen items' attributes.
+
+{"genres": 0.75, "game_modes": 0.75, "player_perspectives": 0.75,
+"multiplayer_modes": 0.75, "keywords": 0.75,
+"similar_games": 0.75, "category": 0.75, "franchises": 0.75,
+"remakes": 0.75, "expansions": 0.75, "tags": 0.75,
+"age_ratings": 0.5, "artworks": 0.5, "themes": 0.5,
+"language_supports": 0.5, "collections": 0.5, "game_engines": 0.5,
+"involved_companies": 0.25, "parent_game": 0.25, "game_localizations": 0.25}
 
 We used the following properties from the IGDB API:
 
-_Descriptions from the IGDB API Documentation_
+_Descriptions from the IGDB API Documentation_ranked by weight groyps
 
+### 0.75 weight
+This will make sure to recommend games with similar gameplay.
 * `genres` - genres of the game
-* `involved_companies` - companies who developed this game
+* `game_modes` - modes of gameplay (singeplayer, multiplayer, etc.)
+* `player_perspectives` - describe the view/perspective of the player in a video game
+* `multiplayer_modes` - multiplayer modes for the game
+* `keywords` - words or phrases that get tagged to a game such as “world war 2” or “steampunk”
+* `similar_games` - games that are similar to this game
+* `category` - the category of this game
+* `franchises` - franchises the game belongs to
+* `remakes` - remakes of this game
+* `expansions` - expansions of the game
+* `tags` - related entities in the IGDB API
+### 0.5 weight
+This will make sure to recommend games with similar artwork, region, language and age requirements.
 * `age_ratings` - age Rating according to various rating organisations
 * `artworks` - official artworks of this game
-* `game_modes` - modes of gameplay (singeplayer, multiplayer, etc.)
-* `keywords` - words or phrases that get tagged to a game such as “world war 2” or “steampunk”
-* `player_perspectives` - describe the view/perspective of the player in a video game
-* `similar_games` - games that are similar to this game
-* `tags` - related entities in the IGDB API
 * `themes` - themes of the game
 * `language_supports` - supported languages for this game
-* `game_localizations` - game localizations for this game. A region can have at most one game localization for a given game
 * `collections` - the series the game belongs to
-* `franchises` - franchises the game belongs to
 * `game_engines` - game engines used in this game
-* `multiplayer_modes` - multiplayer modes for the game
-* `remakes` - remakes of this game
-* `category` - the category of this game
-* `expansions` - expansions of the game
+* `game_localizations` - game localizations for this game. A region can have at most one game localization for a given game
+### 0.25 weight
+This will make sure to recommend games from similar developers and parent games.
+* `involved_companies` - companies who developed this game
 * `parent_game` - if a DLC, expansion or part of a bundle, this is the main game or bundle
 
 ## LLM-based Recommendations
@@ -130,7 +145,8 @@ Then, ChatGPT responds with the following format:
 
 ## Website
 
-In order to easily try out our above models, we built a simple website. The website includes a dropdown where a user can select multiple games. When the user presses submit, each of the recommenders run, with the results displayed on the web page.
+In order to easily try out our above models, we built a simple website. The website includes a dropdown where a user can
+select multiple games. When the user presses submit, each of the recommenders run, with the results displayed on the web page.
 
 ### Demo
 
