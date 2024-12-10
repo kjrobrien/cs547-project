@@ -30,6 +30,11 @@ Then, NextGame uses three methods for generating recommendations: item-based col
 
 ## Website
 
+<video controls width="100%" playsinline autoplay muted loop>
+  <source src="{{ '/assets/videos/site_recording.webm' | relative_url }}" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+
 
 
 # Evaluation
