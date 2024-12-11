@@ -48,20 +48,15 @@ Content-based filtering recommends items that have similar properties to items a
 IGDB API and classified properties with 3 different weight groups based on importance. We then used Jaccard similarity to calculate
 similarities betweeen items' attributes.
 
-{"genres": 0.75, "game_modes": 0.75, "player_perspectives": 0.75,
-"multiplayer_modes": 0.75, "keywords": 0.75,
-"similar_games": 0.75, "category": 0.75, "franchises": 0.75,
-"remakes": 0.75, "expansions": 0.75, "tags": 0.75,
-"age_ratings": 0.5, "artworks": 0.5, "themes": 0.5,
-"language_supports": 0.5, "collections": 0.5, "game_engines": 0.5,
-"involved_companies": 0.25, "parent_game": 0.25, "game_localizations": 0.25}
 
 We used the following properties from the IGDB API:
 
-_Descriptions from the IGDB API Documentation_ranked by weight groyps
+_Descriptions from the IGDB API Documentation_
 
 ### 0.75 weight
+
 This will make sure to recommend games with similar gameplay.
+
 * `genres` - genres of the game
 * `game_modes` - modes of gameplay (singeplayer, multiplayer, etc.)
 * `player_perspectives` - describe the view/perspective of the player in a video game
@@ -73,8 +68,11 @@ This will make sure to recommend games with similar gameplay.
 * `remakes` - remakes of this game
 * `expansions` - expansions of the game
 * `tags` - related entities in the IGDB API
+
 ### 0.5 weight
+
 This will make sure to recommend games with similar artwork, region, language and age requirements.
+
 * `age_ratings` - age Rating according to various rating organisations
 * `artworks` - official artworks of this game
 * `themes` - themes of the game
@@ -82,8 +80,11 @@ This will make sure to recommend games with similar artwork, region, language an
 * `collections` - the series the game belongs to
 * `game_engines` - game engines used in this game
 * `game_localizations` - game localizations for this game. A region can have at most one game localization for a given game
+
 ### 0.25 weight
+
 This will make sure to recommend games from similar developers and parent games.
+
 * `involved_companies` - companies who developed this game
 * `parent_game` - if a DLC, expansion or part of a bundle, this is the main game or bundle
 
