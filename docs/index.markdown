@@ -159,16 +159,21 @@ select multiple games. When the user presses submit, each of the recommenders ru
 ### DATA/Graphs
 
 Most popular Games by rating range
-`Pic`
+
+![best_games](assets/images/best_games.png)
+
 
 Most popular Games by aggregated rating range
-`Pic`
+
+![best_games_aggregated](assets/images/best_games_aggregated.png)
 
 Worst Games by rating range
-`Pic`
+
+![worst_games](assets/images/worst_games.png)
 
 Worst Games by aggregated rating range
-`Pic`
+
+![worst_games](assets/images/worst_games_aggregated.png)
 
 Most Popular Genres:
 * 31: Adventure (981 Games)
@@ -176,7 +181,8 @@ Most Popular Genres:
 * 9: Puzzle (435 Games)
 * 12: RPG (422 Games)
 * 33: Arcade (381)
-`Pic`
+
+![genres](assets/images/genres.png)
 
 Most Franchises:
 * 845: Mario (20 Games)
@@ -193,7 +199,8 @@ Most Game Modes:
 * 4: Split Screen (176 Games)
 * 5: Massively Multiplayer Online (36 Games)
 * 6: Battle Royale (21 Games)
-`Pic` 
+
+![game_modes](assets/images/game_modes.png)
 
 Popular Player Perspectives:
 * 4: Side View (1212 Games)
@@ -203,13 +210,16 @@ Popular Player Perspectives:
 * 5: Text (184 Games)
 * 7: Virtual Reality (51 Games)
 * 6: Auditory (8 Games)
-`Pic`
+
+![player_perspective](assets/images/player_perspective.png)
 
 Popular Themes:
 * 1: Action (2575 Games)
 * 17: Fantasy (1047 Games
 * 18: Science Fiction (600 Games)
 * 27: Comedy (493 Games) 
+
+![themes](assets/images/themes.png)
 
 Popular Game Engines:
 * 13: Unity (631 Games)
