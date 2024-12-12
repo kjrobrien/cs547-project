@@ -156,11 +156,96 @@ select multiple games. When the user presses submit, each of the recommenders ru
   Your browser does not support the video tag.
 </video>
 
+### DATA/Graphs
 
+Most popular Games by rating range
+`Pic`
 
+Most popular Games by aggregated rating range
+`Pic`
+
+Worst Games by rating range
+`Pic`
+
+Worst Games by aggregated rating range
+`Pic`
+
+Most Popular Genres:
+* 31: Adventure (981 Games)
+* 32: Indie (971 Games
+* 9: Puzzle (435 Games)
+* 12: RPG (422 Games)
+* 33: Arcade (381)
+`Pic`
+
+Most Franchises:
+* 845: Mario (20 Games)
+* 51: Lego (17 Games)
+* 60: Pokemon (12 Games)
+* 16: NBA (10 Games)
+* 1: Star Wars (9 Games)
+`Pic` 
+    
+Most Game Modes:
+* 1: Single Player (3994 Games)
+* 2: Multiplayer (1233 Games
+* 3: Co-operative (864 Games)
+* 4: Split Screen (176 Games)
+* 5: Massively Multiplayer Online (36 Games)
+* 6: Battle Royale (21 Games)
+`Pic` 
+
+Popular Player Perspectives:
+* 4: Side View (1212 Games)
+* 3: Bird View / Isometric (1004 Games
+* 2: Third person (906 Games)
+* 1: First person (475 Games)
+* 5: Text (184 Games)
+* 7: Virtual Reality (51 Games)
+* 6: Auditory (8 Games)
+`Pic`
+
+Popular Themes:
+* 1: Action (2575 Games)
+* 17: Fantasy (1047 Games
+* 18: Science Fiction (600 Games)
+* 27: Comedy (493 Games) 
+
+Popular Game Engines:
+* 13: Unity (631 Games)
+* 439: Unreal Engine 4 (166 Games)
+* 6: Unreal Engine (80 Games)
+* 79: GameMaker: Studio (31 Games)
+            
 # Evaluation
+ We developed a survey and shared it with friends to get the below results.                              
+ 50% of the users preferred ChatGPTs response and the other two algorithm were evenly distributed at 25%.
 
-<!-- Insert results of survey -->
+`Survey`: https://forms.gle/NMbAY2fMg3LU6sSP8
+
+`Collaborative Filtering Rating:` 2.78/5
+
+`Content-Based Filtering Rating:` 3.11/5
+
+`ChatGPT:` 3.44/5
+
+How Familiar are you with the listed games? 3.75/5
+How likely are you to use a website like this? 3.55/5
+
+Why was ChatGPT the winner, in summary is because unlike the other two algorithms.
+It had diverse options and did not overfit on the given data from the user. 
+
+From a user:
+
+`The recommended games were diverse enough to connect to each of the games I had selected giving a good variety
+nd not focusing on just one aspect or game in my list`
+
 
 # Conclusion
 
+Developing algorithms to recommend video games is challenging because users have highly diverse
+tastes and preferences influenced by multiple factors. Games require active participation,
+therefore preferences can vary drastically based on mood, available time, desired level of
+engagement and even social trends. This makes it difficult to create a one-size-fits-all
+recommendation system. Furthermore, the sheer volume and sparsity of games complicates the task of
+categorizing and predicting user preferences accurately. 
