@@ -47,14 +47,42 @@ plt.show()
 games_in_90_100 = dfRating[dfRating['rating_range'] == '90-100']
 sorted_games = games_in_90_100.sort_values(by='rating', ascending=False)
 print("Games in the 90-100 rating range")
-for game in sorted_games['name']:
-    print("Game: ", game)
+count = 0
+for _, game in sorted_games.iterrows():
+    print("Game: ", game['name'], " Score: ", game['rating'])
+    count += 1
+    if count == 5:
+        break
+
+games_in_10_20 = dfRating[dfRating['rating_range'] == '10-20']
+sorted_games = games_in_10_20.sort_values(by='rating', ascending=True)
+print("\nWorst games in the rating range")
+count = 0
+for _, game in sorted_games.iterrows():
+    print("Game: ", game['name'], " Score: ", game['rating'])
+    count += 1
+    if count == 5:
+        break
 
 gamesAggregated_in_90_100 = dfAggregatedRating[dfAggregatedRating['rating_range'] == '90-100']
-aggregatedSorted_games = gamesAggregated_in_90_100.sort_values(by='rating', ascending=False)
-print("\n Games in the 90-100 aggregated rating range")
-for game in sorted_games['name']:
-    print("Game: ", game)
+aggregatedSorted_games = gamesAggregated_in_90_100.sort_values(by='aggregated_rating', ascending=False)
+print("\nGames in the 90-100 aggregated rating range")
+count = 0
+for _, game in aggregatedSorted_games.iterrows():
+    print("Game: ", game['name'], " Score: ", game['aggregated_rating'])
+    count += 1
+    if count == 5:
+        break
+
+gamesAggregated_in_0_10 = dfAggregatedRating[dfAggregatedRating['rating_range'] == '0-10']
+aggregatedSorted_games = gamesAggregated_in_0_10.sort_values(by='aggregated_rating', ascending=True)
+print("\nWorst games in the aggregated rating range")
+count = 0
+for _, game in aggregatedSorted_games.iterrows():
+    print("Game: ", game['name'], " Score: ", game['aggregated_rating'])
+    count += 1
+    if count == 5:
+        break
 
 
 
