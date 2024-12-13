@@ -184,13 +184,6 @@ Most Popular Genres:
 
 ![genres](assets/images/genres.png)
 
-Most Franchises:
-* 845: Mario (20 Games)
-* 51: Lego (17 Games)
-* 60: Pokemon (12 Games)
-* 16: NBA (10 Games)
-* 1: Star Wars (9 Games)
-`Pic` 
     
 Most Game Modes:
 * 1: Single Player (3994 Games)
@@ -226,6 +219,13 @@ Popular Game Engines:
 * 439: Unreal Engine 4 (166 Games)
 * 6: Unreal Engine (80 Games)
 * 79: GameMaker: Studio (31 Games)
+
+Most Franchises:
+* 845: Mario (20 Games)
+* 51: Lego (17 Games)
+* 60: Pokemon (12 Games)
+* 16: NBA (10 Games)
+* 1: Star Wars (9 Games)
             
 # Evaluation
  We developed a survey and shared it with friends to get the below results.                              
